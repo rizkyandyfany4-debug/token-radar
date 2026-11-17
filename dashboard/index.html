@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — which pre-token protocol is worth farming next</title>
+<link rel="stylesheet" href="app.css">
+<script src="../data.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="mark">◉</div>
+    <div>
+      <h1>TOKEN RADAR</h1>
+      <p class="tag">Which pre-token protocol is worth farming next — and what to do about it.</p>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="controls">
+      <input id="search" type="search" placeholder="Search name or slug…" aria-label="Search protocols">
+      <select id="category" aria-label="Filter by category"><option value="">All categories</option></select>
+      <div class="chips" role="group" aria-label="Scope">
+        <button class="chip active" data-scope="all">All <span id="n-all"></span></button>
+        <button class="chip" data-scope="watchlist">Watchlist <span id="n-watch"></span></button>
+        <button class="chip" data-scope="early">Early <span id="n-early"></span></button>
+      </div>
+      <select id="sort" aria-label="Sort board">
+        <option value="implied">Sort: implied value</option>
+        <option value="tvl">Sort: TVL</option>
+        <option value="growth">Sort: 7-day change</option>
+        <option value="age">Sort: age</option>
+      </select>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="table-wrap">
+      <table class="board" id="board">
+        <thead><tr>
+          <th>#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+          <th class="num">TVL</th><th class="num">7d</th><th class="num">Age</th>
+          <th class="num">Implied value</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="model-panel">
+    <h2>How the radar prices a token that does not exist yet</h2>
+    <p class="model-line"><code>implied = round(TVL × category multiple × growth × maturity × breadth)</code></p>
+    <p>The <strong>category multiple</strong> is the median market-cap-to-TVL ratio of the live-token
+    protocols in the same category, shrunk toward the overall median with a prior of 4 observations,
+    clamped to 0.05–0.60. A protocol is priced like its own category's traded peers — never from a
+    hand-kept list of names. <strong>Growth</strong> is 1 + the 7-day TVL change (clamped −60% to +120%)
+    × 0.5. <strong>Maturity</strong> is 0.6 + age/1095 days × 0.4 (age unknown: 365 days). <strong>Breadth</strong>
+    is 1 + 0.02 per chain beyond the first, at most 5 extra. Every factor comes from the snapshot's own
+    figures; the model is <span id="model-version"></span> and the overall multiple is
+    <span id="overall-multiple"></span>.</p>
+    <div class="model-grid">
+      <div>
+        <h3>Category multiples</h3>
+        <table class="mini" id="cat-table">
+          <thead><tr><th>Category</th><th>Live peers</th><th>Multiple</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>What the board is</h3>
+        <ul class="notes">
+          <li><strong>Watchlist</strong> — the 40 pre-token protocols at or above $50M TVL. The floor, never the ceiling.</li>
+          <li><strong>Early</strong> — pre-token protocols below the floor, ranked by the same model. This is the radar's job: find them early.</li>
+          <li><strong>Live tokens</strong> — protocols whose token already trades. Shown at the bottom with the market's own values, never ranked.</li>
+          <li>Click any row for its model breakdown and farm plan.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Live tokens — already trading, shown for comparison</h2>
+    <p class="sub">These protocols have a token and a market cap. The board never ranks them; they are the
+    comparables the model prices the pre-token protocols against.</p>
+    <div class="table-wrap">
+      <table class="board mini-table" id="live">
+        <thead><tr>
+          <th>Protocol</th><th>Category</th><th class="num">TVL</th>
+          <th class="num">Market cap</th><th class="num">Mcap / TVL</th><th class="num">7d</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="foot" id="foot"></p>
+  </section>
+</main>
+
+<dialog id="detail">
+  <form method="dialog" class="dlg-close"><button aria-label="Close">✕</button></form>
+  <div id="detail-body"></div>
+</dialog>
+</body>
+</html>
